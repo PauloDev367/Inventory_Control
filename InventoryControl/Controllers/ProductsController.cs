@@ -1,4 +1,5 @@
-﻿using InventoryControl.Requests;
+﻿using InventoryControl.Enums;
+using InventoryControl.Requests;
 using InventoryControl.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace InventoryControl.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly ProductService _service;
+    private readonly StockMovementService _serviceStockMovement;
 
-    public ProductsController(ProductService productService)
+    public ProductsController(ProductService productService, StockMovementService serviceStockMovement)
     {
         _service = productService;
+        _serviceStockMovement = serviceStockMovement;
     }
 
     [HttpGet]
@@ -97,10 +100,32 @@ public class ProductsController : ControllerBase
 
     [HttpGet("{id}/categories")]
     public async Task<IActionResult> GetAllProductCategories(
-        [FromRoute] Guid id
+        [FromRoute] Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int perPage = 10
     )
     {
-        var data = await _service.GetAllProductCategoriesAsync(id);
+        var data = await _serviceStockMovement.GetAllProductStockMovement(page, perPage, id);
         return Ok(data);
+    }
+
+    [HttpPatch("{id}/stock-movement/add")]
+    public async Task<IActionResult> AddStockToProductAsync(
+        [FromRoute] Guid id,
+        [FromBody] AddOrRemoveStockMovementToProductRequest request
+    )
+    {
+        var product = await _service.RemoverOrAddProductQuantityAsync(id, request.Quantity, MovementType.IN);
+        return Ok(product);
+    }
+    
+    [HttpPatch("{id}/stock-movement/remove")]
+    public async Task<IActionResult> RemoveStockToProductAsync(
+        [FromRoute] Guid id,
+        [FromBody] AddOrRemoveStockMovementToProductRequest request
+    )
+    {
+        var product = await _service.RemoverOrAddProductQuantityAsync(id, request.Quantity, MovementType.OUT);
+        return Ok(product);
     }
 }

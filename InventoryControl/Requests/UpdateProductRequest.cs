@@ -12,7 +12,5 @@ public class UpdateProductRequest
     [MinLength(10)] 
     public String Description { get; set; }
     [Required(AllowEmptyStrings = false)]
-    public int Quantity { get; set; }
-    [Required(AllowEmptyStrings = false)]
     public float Price { get; set; }
 }

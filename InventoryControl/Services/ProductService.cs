@@ -1,4 +1,5 @@
 ﻿using InventoryControl.Data;
+using InventoryControl.Enums;
 using InventoryControl.Models;
 using InventoryControl.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,12 @@ namespace InventoryControl.Services;
 public class ProductService
 {
     private readonly AppDbContext _context;
+    private readonly StockMovementService _stockMovementService;
 
-    public ProductService(AppDbContext context)
+    public ProductService(AppDbContext context, StockMovementService stockMovementService)
     {
         _context = context;
+        _stockMovementService = stockMovementService;
     }
 
     public async Task<PaginatedResultResponseRequest<Product>> GetProductsAsync(int pageNumber, int pageSize)
@@ -63,7 +66,6 @@ public class ProductService
         product.Name = request.Name;
         product.Description = request.Description;
         product.Price = request.Price;
-        product.Quantity = request.Quantity;
 
         _context.Products.Update(product);
         await _context.SaveChangesAsync();
@@ -114,7 +116,6 @@ public class ProductService
         await _context.SaveChangesAsync();
     }
 
-
     public async Task RemoveCategoryFromProductAsync(Guid productId, RemoveCategoryToProductRequest request)
     {
         var product = await _context.Products
@@ -148,5 +149,32 @@ public class ProductService
             throw new KeyNotFoundException();
 
         return product.Categories;
+    }
+
+    public async Task<Product> RemoverOrAddProductQuantityAsync(Guid productId, int quantity, MovementType type)
+    {
+        var product = await _context.Products
+            .Include(p => p.Categories)
+            .FirstOrDefaultAsync(p => p.Id == productId && p.DeletedAt == null);
+
+        if (product == null)
+            throw new KeyNotFoundException();
+
+        if (type.Equals(MovementType.IN))
+            product.Quantity += quantity;
+        else
+            product.Quantity -= quantity;
+        
+        _context.Products.Update(product);
+        await _context.SaveChangesAsync();
+
+        var request = new CreateStockMovementRequest
+        {
+            ProductId = productId,
+            Quantity = quantity,
+            MovementType = type
+        };
+        await _stockMovementService.AddStockMovementToProduct(request);
+        return product;
     }
 }
