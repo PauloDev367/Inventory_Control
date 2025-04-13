@@ -11,12 +11,14 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<StockMovement> StockMovements { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new CategoryConfiguration());
         modelBuilder.ApplyConfiguration(new SupplierConfiguration());
+        modelBuilder.ApplyConfiguration(new StockMovementConfiguration());
     }
 
 }
