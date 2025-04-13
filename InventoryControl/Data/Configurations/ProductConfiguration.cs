@@ -36,5 +36,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.DeletedAt)
             .HasColumnName("deleted_at")
             .HasDefaultValue(null);
+
+        builder.HasOne(p => p.Supplier)
+            .WithMany(s => s.Products)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
