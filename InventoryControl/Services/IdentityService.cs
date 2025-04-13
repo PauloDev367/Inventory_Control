@@ -98,11 +98,12 @@ public class IdentityService
         var claims = await _userManager.GetClaimsAsync(user);
         var roles = await _userManager.GetRolesAsync(user);
 
-        claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()));
         claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
         claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, DateTime.Now.ToString()));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()));
+        var unixTimestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+        claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, unixTimestamp.ToString()));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Iat, unixTimestamp.ToString()));
 
         foreach (var role in roles)
             claims.Add(new Claim("role", role));
