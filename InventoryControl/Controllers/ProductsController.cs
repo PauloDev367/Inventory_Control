@@ -9,6 +9,7 @@ namespace InventoryControl.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly ProductService _service;
+
     public ProductsController(ProductService productService)
     {
         _service = productService;
@@ -16,8 +17,8 @@ public class ProductsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(
-    [FromQuery] int page=1,
-    [FromQuery] int perPage=10
+        [FromQuery] int page = 1,
+        [FromQuery] int perPage = 10
     )
     {
         var data = await _service.GetProductsAsync(page, perPage);
@@ -31,4 +32,19 @@ public class ProductsController : ControllerBase
         return Ok(data);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(
+        [FromRoute] Guid id,
+        [FromBody] UpdateProductRequest request)
+    {
+        try
+        {
+            var data = await _service.UpdateProductAsync(request, id);
+            return Ok(data);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { error = "Error when try to update product" });
+        }
+    }
 }
