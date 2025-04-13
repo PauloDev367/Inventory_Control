@@ -1,12 +1,13 @@
 ﻿using InventoryControl.Requests;
 using InventoryControl.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/categories")]
-// [Authorize]
+[Authorize]
 public class CategoriesController : ControllerBase
 {
     private readonly CategoryService _service;
