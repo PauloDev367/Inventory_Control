@@ -1,4 +1,5 @@
-﻿using InventoryControl.Services;
+﻿using InventoryControl.Requests;
+using InventoryControl.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryControl.Controllers;
@@ -19,7 +20,14 @@ public class ProductsController : ControllerBase
     [FromQuery] int perPage=10
     )
     {
-        var data = await _service.GetProducts(page, perPage);
+        var data = await _service.GetProductsAsync(page, perPage);
+        return Ok(data);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync([FromBody] CreateProductRequest request)
+    {
+        var data = await _service.CreateProductAsync(request);
         return Ok(data);
     }
 

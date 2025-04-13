@@ -8,15 +8,16 @@ namespace InventoryControl.Services;
 public class ProductService
 {
     private readonly AppDbContext _context;
+
     public ProductService(AppDbContext context)
     {
         _context = context;
     }
 
-    public async Task<PaginatedResultResponseRequest<Product>> GetProducts(int pageNumber, int pageSize)
+    public async Task<PaginatedResultResponseRequest<Product>> GetProductsAsync(int pageNumber, int pageSize)
     {
         var query = _context.Products.AsQueryable();
-        var totalItems= await query.CountAsync();
+        var totalItems = await query.CountAsync();
 
         var products = await query
             .OrderByDescending(p => p.CreatedAt)
@@ -33,5 +34,19 @@ public class ProductService
             TotalItems = totalItems
         };
     }
-    
+
+    public async Task<Product> CreateProductAsync(CreateProductRequest request)
+    {
+        var product = new Product
+        {
+            Name = request.Name,
+            Description = request.Description,
+            Price = request.Price,
+            Quantity = request.Quantity,
+        };
+
+        await _context.Products.AddAsync(product);
+        await _context.SaveChangesAsync();
+        return product;
+    }
 }
