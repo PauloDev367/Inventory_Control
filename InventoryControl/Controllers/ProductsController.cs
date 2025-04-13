@@ -74,4 +74,33 @@ public class ProductsController : ControllerBase
             return BadRequest(new { error = "Error when try to delete product" });
         }
     }
+
+    [HttpPost("{id}/categories")]
+    public async Task<IActionResult> AddCategoryToProduct(
+        [FromBody] AddCategoryToProductRequest request,
+        [FromRoute] Guid id
+    )
+    {
+        await _service.AddCategoryToProductAsync(id, request);
+        return Ok(new { message = "Category added successfully" });
+    }
+
+    [HttpDelete("{id}/categories")]
+    public async Task<IActionResult> RemoveCategoryFromProduct(
+        [FromBody] RemoveCategoryToProductRequest request,
+        [FromRoute] Guid id
+    )
+    {
+        await _service.RemoveCategoryFromProductAsync(id, request);
+        return Ok(new { message = "Categories removed successfully" });
+    }
+
+    [HttpGet("{id}/categories")]
+    public async Task<IActionResult> GetAllProductCategories(
+        [FromRoute] Guid id
+    )
+    {
+        var data = await _service.GetAllProductCategoriesAsync(id);
+        return Ok(data);
+    }
 }

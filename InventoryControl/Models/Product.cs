@@ -1,4 +1,6 @@
-﻿namespace InventoryControl.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace InventoryControl.Models;
 
 public class Product
 {
@@ -7,6 +9,7 @@ public class Product
     public String Description { get; set; }
     public int Quantity { get; set; }
     public float Price { get; set; }
+    [JsonIgnore]
     public List<Category> Categories { get; set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? DeletedAt { get; set; }

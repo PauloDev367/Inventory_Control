@@ -91,4 +91,62 @@ public class ProductService
         _context.Products.Update(product);
         await _context.SaveChangesAsync();
     }
+
+    public async Task AddCategoryToProductAsync(Guid productId, AddCategoryToProductRequest request)
+    {
+        var product = await _context.Products
+            .Include(p => p.Categories)
+            .FirstOrDefaultAsync(p => p.Id == productId && p.DeletedAt == null);
+
+        if (product == null)
+            throw new KeyNotFoundException();
+
+        var categories = await _context.Categories
+            .Where(c => request.CategoriesId.Contains(c.Id) && c.DeletedAt == null)
+            .ToListAsync();
+
+        foreach (var category in categories)
+        {
+            if (!product.Categories.Contains(category))
+                product.Categories.Add(category);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+
+    public async Task RemoveCategoryFromProductAsync(Guid productId, RemoveCategoryToProductRequest request)
+    {
+        var product = await _context.Products
+            .Include(p => p.Categories)
+            .FirstOrDefaultAsync(p => p.Id == productId && p.DeletedAt == null);
+
+        if (product == null)
+            throw new KeyNotFoundException();
+
+        var categoriesToRemove = await _context.Categories
+            .Where(c => request.CategoriesId.Contains(c.Id) && c.DeletedAt == null)
+            .ToListAsync();
+
+        foreach (var category in categoriesToRemove)
+        {
+            if (product.Categories.Contains(category))
+                product.Categories.Remove(category);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Category>> GetAllProductCategoriesAsync(Guid productId)
+    {
+        var product = await _context.Products
+            .Where(p => p.DeletedAt == null)
+            .Include(p => p.Categories)
+            .FirstOrDefaultAsync(p => p.Id.Equals(productId));
+
+        if (product == null)
+            throw new KeyNotFoundException();
+
+        return product.Categories;
+    }
 }
