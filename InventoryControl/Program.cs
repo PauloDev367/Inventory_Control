@@ -1,4 +1,6 @@
 
+using InventoryControl.Extensions;
+
 namespace InventoryControl
 {
     public class Program
@@ -7,16 +9,15 @@ namespace InventoryControl
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            
+            builder.Services.ConfigureIdentityAuth(builder.Configuration);
+            builder.Services.ConfigureDbContext(builder.Configuration);
+            builder.Services.LoadDependencies();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -25,9 +26,9 @@ namespace InventoryControl
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
+            
             app.MapControllers();
 
             app.Run();
