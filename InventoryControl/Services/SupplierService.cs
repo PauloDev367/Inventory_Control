@@ -11,12 +11,12 @@ public class SupplierService
 
     public SupplierService(AppDbContext context) => _context = context;
     
-    public async Task<PaginatedResultResponseRequest<Supplier>> GetCategoriesAsync(int pageNumber, int pageSize)
+    public async Task<PaginatedResultResponseRequest<Supplier>> GetSupplierAsync(int pageNumber, int pageSize)
     {
         var query = _context.Suppliers.AsQueryable();
         var totalItems = await query.CountAsync();
 
-        var categories = await query
+        var supplier = await query
             .OrderByDescending(p => p.CreatedAt)
             .AsNoTracking()
             .Where(p => p.DeletedAt == null)
@@ -26,7 +26,7 @@ public class SupplierService
 
         return new PaginatedResultResponseRequest<Supplier>
         {
-            Items = categories,
+            Items = supplier,
             PageNumber = pageNumber,
             PageSize = pageSize,
             TotalItems = totalItems
@@ -85,5 +85,51 @@ public class SupplierService
         supplier.DeletedAt = DateTime.Now;
         _context.Suppliers.Update(supplier);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task AddSupplierToProductAsync(Guid supplierId, Guid productId)
+    {
+        var product = await _context.Products
+            .FirstOrDefaultAsync(p=>p.Id.Equals(productId));
+        if (product == null)
+            throw new KeyNotFoundException();
+        
+        product.SupplierId = supplierId;
+        _context.Products.Update(product);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveSupplierFromProductAsync(Guid supplierId, Guid productId)
+    {
+        var product = await _context.Products
+            .FirstOrDefaultAsync(p=>p.Id.Equals(productId));
+        if (product == null)
+            throw new KeyNotFoundException();
+        product.SupplierId = null;
+        _context.Products.Update(product);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<PaginatedResultResponseRequest<Product>> GetSupplierProductsAsync(int pageNumber, int pageSize, int supplierId)
+    {
+        var query = _context.Products.AsQueryable();
+        var totalItems = await query.CountAsync();
+
+        var products = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .AsNoTracking()
+            .Where(p => p.DeletedAt == null)
+            .Where(p=>p.SupplierId.Equals(supplierId))
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PaginatedResultResponseRequest<Product>
+        {
+            Items = products,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = totalItems
+        };
     }
 }
