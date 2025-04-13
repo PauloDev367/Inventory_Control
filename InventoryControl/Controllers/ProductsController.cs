@@ -7,7 +7,7 @@ namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/products")]
-[Authorize]
+// [Authorize]
 public class ProductsController : ControllerBase
 {
     private readonly ProductService _service;

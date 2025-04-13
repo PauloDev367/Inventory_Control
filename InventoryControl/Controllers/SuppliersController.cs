@@ -1,19 +1,17 @@
 ﻿using InventoryControl.Requests;
 using InventoryControl.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryControl.Controllers;
 
 [ApiController]
-[Route("api/v1/categories")]
-// [Authorize]
-public class CategoriesController : ControllerBase
+[Route("api/v1/suppliers")]
+public class SuppliersController: ControllerBase
 {
-    private readonly CategoryService _service;
+    private readonly SupplierService _service;
 
-    public CategoriesController(CategoryService categoryService)
-        => _service = categoryService;
+    public SuppliersController(SupplierService supplierService)
+        => _service = supplierService;
 
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(
@@ -21,30 +19,30 @@ public class CategoriesController : ControllerBase
         [FromQuery] int perPage = 10
     )
     {
-        var data = await _service.GetCategoriesAsync(page, perPage);
+        var data = await _service.GetSupplierAsync(page, perPage);
         return Ok(data);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] CreateCategoryRequest request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateSupplierRequest request)
     {
-        var data = await _service.CreateCategoryAsync(request);
+        var data = await _service.CreateSupplierAsync(request);
         return Ok(data);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAsync(
         [FromRoute] Guid id,
-        [FromBody] UpdateCategoryRequest request)
+        [FromBody] UpdateSupplierRequest request)
     {
         try
         {
-            var data = await _service.UpdateCategoryAsync(request, id);
+            var data = await _service.UpdateSupplierAsync(request, id);
             return Ok(data);
         }
         catch (Exception e)
         {
-            return BadRequest(new { error = "Error when try to update category" });
+            return BadRequest(new { error = "Error when try to update supplier" });
         }
     }
 
@@ -64,12 +62,12 @@ public class CategoriesController : ControllerBase
     {
         try
         {
-            await _service.DeleteCategoryAsync(id);
+            await _service.DeleteSupplierAsync(id);
             return Ok(new { message = "Deleted successfully" });
         }
         catch (Exception e)
         {
-            return BadRequest(new { error = "Error when try to delete category" });
+            return BadRequest(new { error = "Error when try to delete supplier" });
         }
     }
 }
