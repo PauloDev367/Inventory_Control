@@ -54,8 +54,22 @@ public class ProductsController : ControllerBase
     )
     {
         var data = await _service.GetOneById(id);
-        if(data == null)
+        if (data == null)
             return NotFound();
         return Ok(data);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid id)
+    {
+        try
+        {
+            await _service.DeleteProductAsync(id);
+            return Ok(new { message = "Deleted successfully" });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { error = "Error when try to delete product" });
+        }
     }
 }

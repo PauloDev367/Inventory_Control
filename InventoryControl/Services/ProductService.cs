@@ -22,6 +22,7 @@ public class ProductService
         var products = await query
             .OrderByDescending(p => p.CreatedAt)
             .AsNoTracking()
+            .Where(p => p.DeletedAt == null)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -53,6 +54,7 @@ public class ProductService
     public async Task<Product> UpdateProductAsync(UpdateProductRequest request, Guid productId)
     {
         var product = await _context.Products
+            .Where(p => p.DeletedAt == null)
             .FirstOrDefaultAsync(p => p.Id.Equals(productId));
 
         if (product == null)
@@ -71,7 +73,22 @@ public class ProductService
     public async Task<Product?> GetOneById(Guid productId)
     {
         return await _context.Products
+            .Where(p => p.DeletedAt == null)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id.Equals(productId));
+    }
+
+    public async Task DeleteProductAsync(Guid productId)
+    {
+        var product = await _context.Products
+            .Where(p => p.DeletedAt == null)
+            .FirstOrDefaultAsync(p => p.Id.Equals(productId));
+
+        if (product == null)
+            throw new KeyNotFoundException();
+
+        product.DeletedAt = DateTime.Now;
+        _context.Products.Update(product);
+        await _context.SaveChangesAsync();
     }
 }

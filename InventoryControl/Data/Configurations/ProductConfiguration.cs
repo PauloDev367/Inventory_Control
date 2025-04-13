@@ -32,5 +32,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasColumnName("created_at")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
+
+        builder.Property(p => p.DeletedAt)
+            .HasColumnName("deleted_at")
+            .HasDefaultValue(null);
     }
 }
