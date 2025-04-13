@@ -6,7 +6,7 @@ namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/suppliers")]
-public class SuppliersController: ControllerBase
+public class SuppliersController : ControllerBase
 {
     private readonly SupplierService _service;
 
@@ -69,5 +69,33 @@ public class SuppliersController: ControllerBase
         {
             return BadRequest(new { error = "Error when try to delete supplier" });
         }
+    }
+
+    [HttpPost("{id}/products")]
+    public async Task<IActionResult> AddSupplierToProductAsync([FromRoute] Guid id,
+        [FromBody] AddSupplierToProductRequest request)
+    {
+        await _service.AddSupplierToProductAsync(id, request.ProductId);
+        return Ok(new { message = "Added successfully" });
+    }
+
+    [HttpDelete("{id}/product")]
+    public async Task<IActionResult> RemoveSupplierFromProductAsync(
+        [FromRoute] Guid id,
+        [FromBody] RemoveSupplierToProductRequest request
+        )
+    {
+        await _service.RemoveSupplierFromProductAsync(id, request.ProductId);
+        return Ok(new { message = "Removed successfully" });
+    }
+
+    [HttpGet("{id}/products/{productId}")]
+    public async Task<IActionResult> GetSupplierProductsAsync(
+        [FromRoute] Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int perPage = 10)
+    {
+        var data = await _service.GetSupplierProductsAsync(page, perPage, id);
+        return Ok(data);
     }
 }

@@ -85,6 +85,16 @@ public class SupplierService
         supplier.DeletedAt = DateTime.Now;
         _context.Suppliers.Update(supplier);
         await _context.SaveChangesAsync();
+        
+        var products = await _context.Products
+            .Where(p => p.SupplierId.Equals(supplierId))
+            .ToListAsync();
+        foreach (var product in products)
+        {
+            product.SupplierId = null;
+            _context.Products.Update(product);
+        }
+        await _context.SaveChangesAsync();
     }
 
     public async Task AddSupplierToProductAsync(Guid supplierId, Guid productId)
@@ -110,7 +120,7 @@ public class SupplierService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<PaginatedResultResponseRequest<Product>> GetSupplierProductsAsync(int pageNumber, int pageSize, int supplierId)
+    public async Task<PaginatedResultResponseRequest<Product>> GetSupplierProductsAsync(int pageNumber, int pageSize, Guid supplierId)
     {
         var query = _context.Products.AsQueryable();
         var totalItems = await query.CountAsync();
