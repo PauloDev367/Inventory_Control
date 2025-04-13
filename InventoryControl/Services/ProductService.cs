@@ -53,18 +53,25 @@ public class ProductService
     public async Task<Product> UpdateProductAsync(UpdateProductRequest request, Guid productId)
     {
         var product = await _context.Products
-            .FirstOrDefaultAsync(p=>p.Id.Equals(productId));
-        
-        if(product == null)
+            .FirstOrDefaultAsync(p => p.Id.Equals(productId));
+
+        if (product == null)
             throw new KeyNotFoundException();
-        
+
         product.Name = request.Name;
         product.Description = request.Description;
         product.Price = request.Price;
         product.Quantity = request.Quantity;
-        
+
         _context.Products.Update(product);
         await _context.SaveChangesAsync();
-        return product; 
+        return product;
+    }
+
+    public async Task<Product?> GetOneById(Guid productId)
+    {
+        return await _context.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id.Equals(productId));
     }
 }

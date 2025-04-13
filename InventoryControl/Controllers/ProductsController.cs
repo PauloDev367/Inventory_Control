@@ -47,4 +47,15 @@ public class ProductsController : ControllerBase
             return BadRequest(new { error = "Error when try to update product" });
         }
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync(
+        [FromRoute] Guid id
+    )
+    {
+        var data = await _service.GetOneById(id);
+        if(data == null)
+            return NotFound();
+        return Ok(data);
+    }
 }
