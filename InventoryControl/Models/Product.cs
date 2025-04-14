@@ -9,6 +9,7 @@ public class Product
     public String Description { get; set; }
     public int Quantity { get; set; }
     public float Price { get; set; }
+    public int MinimumStock { get; set; }
     [JsonIgnore]
     public List<Category> Categories { get; set; }
     [JsonIgnore] 

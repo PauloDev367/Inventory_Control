@@ -13,4 +13,6 @@ public class UpdateProductRequest
     public String Description { get; set; }
     [Required(AllowEmptyStrings = false)]
     public float Price { get; set; }
+    [Required] 
+    public int MinimumStock { get; set; }
 }

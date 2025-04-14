@@ -15,4 +15,6 @@ public class CreateProductRequest
     public int Quantity { get; set; }
     [Required(AllowEmptyStrings = false)]
     public float Price { get; set; }
+    [Required] 
+    public int MinimumStock { get; set; }
 }

@@ -1,5 +1,6 @@
 ﻿using InventoryControl.Data;
 using InventoryControl.Enums;
+using InventoryControl.Handlers;
 using InventoryControl.Models;
 using InventoryControl.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,7 @@ public class ProductService
             Description = request.Description,
             Price = request.Price,
             Quantity = request.Quantity,
+            MinimumStock = request.MinimumStock,
         };
 
         await _context.Products.AddAsync(product);
@@ -66,6 +68,7 @@ public class ProductService
         product.Name = request.Name;
         product.Description = request.Description;
         product.Price = request.Price;
+        product.MinimumStock = request.MinimumStock;
 
         _context.Products.Update(product);
         await _context.SaveChangesAsync();
@@ -161,10 +164,16 @@ public class ProductService
             throw new KeyNotFoundException();
 
         if (type.Equals(MovementType.IN))
+        {
             product.Quantity += quantity;
+        }
         else
+        {
             product.Quantity -= quantity;
-        
+            if (product.Quantity <= product.MinimumStock)
+                SendStockAlertHandler.handleAsync("email@email.com", product, quantity);
+        }
+
         _context.Products.Update(product);
         await _context.SaveChangesAsync();
 
