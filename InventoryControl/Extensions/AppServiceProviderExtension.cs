@@ -11,5 +11,6 @@ public static class AppServiceProviderExtension
         service.AddTransient<CategoryService, CategoryService>();
         service.AddTransient<SupplierService, SupplierService>();
         service.AddTransient<StockMovementService, StockMovementService>();
+        service.AddTransient<ProductPriceService, ProductPriceService>();
     }
 }
