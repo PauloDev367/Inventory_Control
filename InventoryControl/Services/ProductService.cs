@@ -11,11 +11,13 @@ public class ProductService
 {
     private readonly AppDbContext _context;
     private readonly StockMovementService _stockMovementService;
+    private readonly ProductPriceService _productPriceService;
 
-    public ProductService(AppDbContext context, StockMovementService stockMovementService)
+    public ProductService(AppDbContext context, StockMovementService stockMovementService, ProductPriceService productPriceService)
     {
         _context = context;
         _stockMovementService = stockMovementService;
+        _productPriceService = productPriceService;
     }
 
     public async Task<PaginatedResultResponseRequest<Product>> GetProductsAsync(int pageNumber, int pageSize)
@@ -53,6 +55,13 @@ public class ProductService
 
         await _context.Products.AddAsync(product);
         await _context.SaveChangesAsync();
+
+        var productPriceRequest = new CreateProductPriceRequest
+        {
+            ProductId = product.Id,
+            Price = product.Price,
+        };
+        await _productPriceService.CreateProductPriceAsync(productPriceRequest);
         return product;
     }
 
@@ -65,6 +74,7 @@ public class ProductService
         if (product == null)
             throw new KeyNotFoundException();
 
+        var priceBeforeUpdate = product.Price;
         product.Name = request.Name;
         product.Description = request.Description;
         product.Price = request.Price;
@@ -72,6 +82,16 @@ public class ProductService
 
         _context.Products.Update(product);
         await _context.SaveChangesAsync();
+
+        if (product.Price != priceBeforeUpdate)
+        {
+            var productPriceRequest = new CreateProductPriceRequest
+            {
+                ProductId = product.Id,
+                Price = product.Price,
+            };
+            await _productPriceService.CreateProductPriceAsync(productPriceRequest);
+        }
         return product;
     }
 

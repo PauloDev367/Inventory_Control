@@ -20,6 +20,7 @@ public class AppDbContext : IdentityDbContext<User>
         modelBuilder.ApplyConfiguration(new CategoryConfiguration());
         modelBuilder.ApplyConfiguration(new SupplierConfiguration());
         modelBuilder.ApplyConfiguration(new StockMovementConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductPriceConfiguration());
     }
 
 }
