@@ -40,5 +40,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasOne(p => p.Supplier)
             .WithMany(s => s.Products)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        builder.HasMany(p => p.ProductPrices)
+            .WithOne(pp => pp.Product);
     }
 }
