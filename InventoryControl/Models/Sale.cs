@@ -9,5 +9,7 @@ public class Sale
     [JsonIgnore]
     public Product Product { get; set; }
     public float TotalPrice { get; set; }
+    public int Quantity { get; set; }
+    public float UnityPrice { get; set; }
     public DateTime CreatedAt { get; private set; }
 }
