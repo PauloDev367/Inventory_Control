@@ -15,6 +15,7 @@ public class Product
     [JsonIgnore] 
     public Supplier? Supplier { get; set; }
     [JsonIgnore] public List<ProductPrice> ProductPrices { get; set; }
+    [JsonIgnore] public List<Sale> Sales { get; set; }
     public Guid? SupplierId { get; set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? DeletedAt { get; set; }

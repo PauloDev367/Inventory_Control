@@ -43,5 +43,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         
         builder.HasMany(p => p.ProductPrices)
             .WithOne(pp => pp.Product);
+        
+        builder.HasMany(p => p.Sales)
+            .WithOne(s => s.Product);
     }
 }

@@ -13,6 +13,7 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<StockMovement> StockMovements { get; set; }
     public DbSet<ProductPrice> ProductPrices { get; set; }
+    public DbSet<Sale> Sales { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -21,6 +22,7 @@ public class AppDbContext : IdentityDbContext<User>
         modelBuilder.ApplyConfiguration(new SupplierConfiguration());
         modelBuilder.ApplyConfiguration(new StockMovementConfiguration());
         modelBuilder.ApplyConfiguration(new ProductPriceConfiguration());
+        modelBuilder.ApplyConfiguration(new SalesConfiguration());
     }
 
 }
