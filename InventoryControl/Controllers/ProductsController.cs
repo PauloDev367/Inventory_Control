@@ -100,12 +100,10 @@ public class ProductsController : ControllerBase
 
     [HttpGet("{id}/categories")]
     public async Task<IActionResult> GetAllProductCategories(
-        [FromRoute] Guid id,
-        [FromQuery] int page = 1,
-        [FromQuery] int perPage = 10
+        [FromRoute] Guid id
     )
     {
-        var data = await _serviceStockMovement.GetAllProductStockMovement(page, perPage, id);
+        var data = await _service.GetAllProductCategoriesAsync(id);
         return Ok(data);
     }
 

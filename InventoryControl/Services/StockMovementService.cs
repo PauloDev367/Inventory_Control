@@ -1,4 +1,5 @@
 ﻿using InventoryControl.Data;
+using InventoryControl.Enums;
 using InventoryControl.Models;
 using InventoryControl.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -10,19 +11,28 @@ public class StockMovementService
     private readonly AppDbContext _context;
     public StockMovementService(AppDbContext context) => _context = context;
 
-    public async Task<PaginatedResultResponseRequest<StockMovement>> GetAllProductStockMovement(int pageNumber, int pageSize, Guid productId)
+    public async Task<PaginatedResultResponseRequest<StockMovement>> GetAllProductStockMovement(int pageNumber,
+        int pageSize, Guid productId, MovementType? type)
     {
         var query = _context.StockMovements.AsQueryable();
         var totalItems = await query.CountAsync();
 
-        var stockMovements = await query
+        query = query
             .OrderByDescending(sm => sm.CreatedAt)
             .AsNoTracking()
             .Where(sm => sm.ProductId.Equals(productId))
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+            .Take(pageSize);
+        
+        if (type != null)
+        {
+            if (type.Value == MovementType.IN || type.Value == MovementType.OUT)
+            {
+                query = query.Where(sm => sm.MovementType == type);        
+            }
+        }
 
+        var stockMovements = await query.ToListAsync();
         return new PaginatedResultResponseRequest<StockMovement>
         {
             Items = stockMovements,
@@ -44,5 +54,4 @@ public class StockMovementService
         await _context.SaveChangesAsync();
         return stockMovement;
     }
-    
 }
