@@ -1,4 +1,5 @@
 ﻿using InventoryControl.Data;
+using InventoryControl.Enums;
 using InventoryControl.Models;
 using InventoryControl.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +9,13 @@ namespace InventoryControl.Services;
 public class SaleService
 {
     private readonly AppDbContext _context;
+    private readonly ProductService _productService;
 
-    public SaleService(AppDbContext context) => _context = context;
+    public SaleService(AppDbContext context, ProductService productService)
+    {
+        _context = context;
+        _productService = productService;
+    }
 
     public async Task<Sale> CreateAsync(CreateSaleRequest request)
     {
@@ -24,7 +30,8 @@ public class SaleService
 
         await _context.Sales.AddAsync(sale);
         await _context.SaveChangesAsync();
-
+        
+        await _productService.RemoverOrAddProductQuantityAsync(request.ProductId, request.Quantity, MovementType.OUT);
         return sale;
     }
 
