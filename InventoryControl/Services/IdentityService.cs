@@ -50,7 +50,7 @@ public class IdentityService
 
     public async Task<ResponseRequest<object>> Login(UserLoginRequest request)
     {
-        var result = await _signInManager.PasswordSignInAsync(request.Email, request.Senha, false, true);
+        var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, false, true);
 
         var response = new ResponseRequest<object>();
         if (result.Succeeded)

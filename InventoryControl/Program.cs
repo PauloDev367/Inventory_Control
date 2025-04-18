@@ -16,6 +16,16 @@ namespace InventoryControl
             builder.Services.ConfigureDbContext(builder.Configuration);
             builder.Services.LoadDependencies();
 
+            builder.Services.AddCors(opt =>
+            {
+                opt.AddPolicy("AllowAll", policy =>
+                {
+                    policy
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -23,7 +33,7 @@ namespace InventoryControl
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors("AllowAll");
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
