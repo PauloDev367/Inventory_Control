@@ -1,12 +1,14 @@
 ﻿using InventoryControl.Enums;
 using InventoryControl.Models;
 using InventoryControl.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/controller-movements")]
+[Authorize]
 public class StockMovementController : ControllerBase
 {
     private readonly StockMovementService _service;

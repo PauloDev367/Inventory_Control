@@ -1,11 +1,13 @@
 ﻿using InventoryControl.Requests;
 using InventoryControl.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/suppliers")]
+[Authorize]
 public class SuppliersController : ControllerBase
 {
     private readonly SupplierService _service;

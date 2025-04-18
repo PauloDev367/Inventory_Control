@@ -1,11 +1,13 @@
 ﻿using InventoryControl.Data;
 using InventoryControl.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("/api/v1/products-prices")]
+[Authorize]
 public class ProductPricesController : ControllerBase
 {
     private readonly ProductPriceService _productPriceService;
