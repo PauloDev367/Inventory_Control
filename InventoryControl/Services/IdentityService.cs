@@ -6,6 +6,7 @@ using System.Security.Claims;
 using InventoryControl.Configurations;
 using InventoryControl.Models;
 using InventoryControl.Requests;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryControl.Services;
 
@@ -14,6 +15,7 @@ public class IdentityService
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly JwtOptions _jwtOptions;
+    
 
     public IdentityService(SignInManager<User> signInManager, UserManager<User> userManager, IOptions<JwtOptions> jwtOptions)
     {
@@ -110,4 +112,62 @@ public class IdentityService
 
         return claims;
     }
+    
+    public async Task<PaginatedResultResponseRequest<UserListItemResponse>> GetPaginatedUsersAsync(int pageNumber, int pageSize)
+    {
+        var users = _userManager.Users;
+
+        int totalItems = await users.CountAsync();
+        var items = await users
+            .OrderBy(u => u.UserName)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(u => new UserListItemResponse
+            {
+                Id = u.Id,
+                Email = u.Email,
+                Name = u.UserName
+            })
+            .ToListAsync();
+
+
+        return new PaginatedResultResponseRequest<UserListItemResponse>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = totalItems
+        };
+    }
+
+    public async Task<IdentityResult> UpdateUserAsync(string userId, UpdateUserRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new KeyNotFoundException("Usuário não encontrado.");
+
+        user.UserName = request.Email;
+        user.Email = request.Email;
+        user.UserName = request.Name;
+
+        // Atualiza dados básicos
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+            return updateResult;
+
+        // Atualiza a senha
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var passwordResult = await _userManager.ResetPasswordAsync(user, token, request.Password);
+        return passwordResult;
+    }
+    public async Task<IdentityResult> DeleteUserAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new KeyNotFoundException("Usuário não encontrado.");
+
+        return await _userManager.DeleteAsync(user);
+    }
+
+    
 }
