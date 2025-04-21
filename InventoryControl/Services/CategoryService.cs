@@ -10,16 +10,23 @@ public class CategoryService
     private readonly AppDbContext _context;
 
     public CategoryService(AppDbContext context) => _context = context;
-    
-    public async Task<PaginatedResultResponseRequest<Category>> GetCategoriesAsync(int pageNumber, int pageSize)
+
+    public async Task<PaginatedResultResponseRequest<Category>> GetCategoriesAsync(int pageNumber, int pageSize,
+        string? search = null)
     {
-        var query = _context.Categories.AsQueryable();
+        var query = _context.Categories
+            .Where(p => p.DeletedAt == null);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.Name.Contains(search));
+        }
+
         var totalItems = await query.CountAsync();
 
         var categories = await query
             .OrderByDescending(p => p.CreatedAt)
             .AsNoTracking()
-            .Where(p => p.DeletedAt == null)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -32,7 +39,8 @@ public class CategoryService
             TotalItems = totalItems
         };
     }
-    
+
+
     public async Task<Category> CreateCategoryAsync(CreateCategoryRequest request)
     {
         var category = new Category()
@@ -55,7 +63,7 @@ public class CategoryService
             throw new KeyNotFoundException();
 
         category.Name = request.Name;
-        
+
         _context.Categories.Update(category);
         await _context.SaveChangesAsync();
         return category;

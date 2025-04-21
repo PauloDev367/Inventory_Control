@@ -7,7 +7,7 @@ namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/categories")]
-[Authorize]
+// [Authorize]
 public class CategoriesController : ControllerBase
 {
     private readonly CategoryService _service;
@@ -18,12 +18,14 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(
         [FromQuery] int page = 1,
-        [FromQuery] int perPage = 10
+        [FromQuery] int perPage = 10,
+        [FromQuery] string? search = null
     )
     {
-        var data = await _service.GetCategoriesAsync(page, perPage);
+        var data = await _service.GetCategoriesAsync(page, perPage, search);
         return Ok(data);
     }
+
 
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] CreateCategoryRequest request)
