@@ -12,12 +12,14 @@ public class ProductService
     private readonly AppDbContext _context;
     private readonly StockMovementService _stockMovementService;
     private readonly ProductPriceService _productPriceService;
+    private readonly SendStockAlertHandler _sendStockAlertHandler;
 
-    public ProductService(AppDbContext context, StockMovementService stockMovementService, ProductPriceService productPriceService)
+    public ProductService(AppDbContext context, StockMovementService stockMovementService, ProductPriceService productPriceService, SendStockAlertHandler sendStockAlertHandler)
     {
         _context = context;
         _stockMovementService = stockMovementService;
         _productPriceService = productPriceService;
+        _sendStockAlertHandler = sendStockAlertHandler;
     }
 
     public async Task<PaginatedResultResponseRequest<Product>> GetProductsAsync(int pageNumber, int pageSize)
@@ -191,7 +193,7 @@ public class ProductService
         {
             product.Quantity -= quantity;
             if (product.Quantity <= product.MinimumStock)
-                SendStockAlertHandler.handleAsync("email@email.com", product, quantity);
+                _sendStockAlertHandler.handleAsync(product, quantity);
         }
 
         _context.Products.Update(product);

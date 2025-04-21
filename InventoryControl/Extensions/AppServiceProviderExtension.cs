@@ -1,4 +1,6 @@
-﻿using InventoryControl.Services;
+﻿using InventoryControl.Configurations;
+using InventoryControl.Handlers;
+using InventoryControl.Services;
 
 namespace InventoryControl.Extensions;
 
@@ -13,5 +15,6 @@ public static class AppServiceProviderExtension
         service.AddTransient<StockMovementService, StockMovementService>();
         service.AddTransient<ProductPriceService, ProductPriceService>();
         service.AddTransient<SaleService, SaleService>();
+        service.AddTransient<SendStockAlertHandler, SendStockAlertHandler>();
     }
 }

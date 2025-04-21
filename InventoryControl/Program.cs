@@ -1,4 +1,5 @@
 
+using InventoryControl.Configurations;
 using InventoryControl.Extensions;
 
 namespace InventoryControl
@@ -9,6 +10,8 @@ namespace InventoryControl
         {
             DotNetEnv.Env.Load();
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             
