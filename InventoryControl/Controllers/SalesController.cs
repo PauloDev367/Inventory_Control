@@ -7,7 +7,7 @@ namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/sales")]
-[Authorize]
+// [Authorize]
 public class SalesController : ControllerBase
 {
     private readonly SaleService _saleService;
@@ -31,6 +31,14 @@ public class SalesController : ControllerBase
         [FromQuery] int pageSize = 10)
     {
         var data = await _saleService.GetProductSalesAsync(page, pageSize, id);
+        return Ok(data);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetAllSales(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var data = await _saleService.GetAllSalesAsync(page, pageSize);
         return Ok(data);
     }
 }

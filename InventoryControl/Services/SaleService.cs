@@ -57,4 +57,25 @@ public class SaleService
             TotalItems = totalItems
         };
     }
+    
+    public async Task<PaginatedResultResponseRequest<Sale>> GetAllSalesAsync(int pageNumber, int pageSize)
+    {
+        var query = _context.Sales.AsQueryable();
+        var totalItems = await query.CountAsync();
+
+        var sales = await query
+            .OrderByDescending(s => s.CreatedAt)
+            .AsNoTracking()
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PaginatedResultResponseRequest<Sale>
+        {
+            Items = sales,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = totalItems
+        };
+    }
 }
