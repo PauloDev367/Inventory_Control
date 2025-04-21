@@ -18,10 +18,11 @@ public class SuppliersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(
         [FromQuery] int page = 1,
-        [FromQuery] int perPage = 10
+        [FromQuery] int perPage = 10,
+        [FromQuery] string? search = null
     )
     {
-        var data = await _service.GetSupplierAsync(page, perPage);
+        var data = await _service.GetSupplierAsync(page, perPage, search);
         return Ok(data);
     }
 

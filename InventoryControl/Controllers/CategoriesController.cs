@@ -7,7 +7,7 @@ namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/categories")]
-// [Authorize]
+[Authorize]
 public class CategoriesController : ControllerBase
 {
     private readonly CategoryService _service;

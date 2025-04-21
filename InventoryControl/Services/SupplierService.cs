@@ -11,27 +11,34 @@ public class SupplierService
 
     public SupplierService(AppDbContext context) => _context = context;
     
-    public async Task<PaginatedResultResponseRequest<Supplier>> GetSupplierAsync(int pageNumber, int pageSize)
+    public async Task<PaginatedResultResponseRequest<Supplier>> GetSupplierAsync(int pageNumber, int pageSize, string? search = null)
     {
-        var query = _context.Suppliers.AsQueryable();
+        var query = _context.Suppliers
+            .Where(p => p.DeletedAt == null);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.Name.ToLower().Contains(search.ToLower()));
+        }
+
         var totalItems = await query.CountAsync();
 
-        var supplier = await query
+        var suppliers = await query
             .OrderByDescending(p => p.CreatedAt)
             .AsNoTracking()
-            .Where(p => p.DeletedAt == null)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return new PaginatedResultResponseRequest<Supplier>
         {
-            Items = supplier,
+            Items = suppliers,
             PageNumber = pageNumber,
             PageSize = pageSize,
             TotalItems = totalItems
         };
     }
+
     
     public async Task<Supplier> CreateSupplierAsync(CreateSupplierRequest request)
     {
