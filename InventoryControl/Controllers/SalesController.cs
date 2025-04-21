@@ -7,7 +7,7 @@ namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("api/v1/sales")]
-// [Authorize]
+[Authorize]
 public class SalesController : ControllerBase
 {
     private readonly SaleService _saleService;

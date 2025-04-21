@@ -23,12 +23,12 @@ public class StockMovementService
             .Where(sm => sm.ProductId.Equals(productId))
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize);
-        
+
         if (type != null)
         {
             if (type.Value == MovementType.IN || type.Value == MovementType.OUT)
             {
-                query = query.Where(sm => sm.MovementType == type);        
+                query = query.Where(sm => sm.MovementType == type);
             }
         }
 
@@ -41,6 +41,37 @@ public class StockMovementService
             TotalItems = totalItems
         };
     }
+
+    public async Task<PaginatedResultResponseRequest<StockMovement>> GetAllStockMovement(int pageNumber,
+        int pageSize, MovementType? type)
+    {
+        var query = _context.StockMovements.AsQueryable();
+        var totalItems = await query.CountAsync();
+
+        query = query
+            .OrderByDescending(sm => sm.CreatedAt)
+            .AsNoTracking()
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize);
+
+        if (type != null)
+        {
+            if (type.Value == MovementType.IN || type.Value == MovementType.OUT)
+            {
+                query = query.Where(sm => sm.MovementType == type);
+            }
+        }
+
+        var stockMovements = await query.ToListAsync();
+        return new PaginatedResultResponseRequest<StockMovement>
+        {
+            Items = stockMovements,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = totalItems
+        };
+    }
+
 
     public async Task<StockMovement> AddStockMovementToProduct(CreateStockMovementRequest request)
     {
