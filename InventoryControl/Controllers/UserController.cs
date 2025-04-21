@@ -1,12 +1,13 @@
 ﻿using InventoryControl.Requests;
 using InventoryControl.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryControl.Controllers;
 
 [ApiController]
 [Route("/api/v1/users")]
-// [Authorize]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IdentityService _identityService;
